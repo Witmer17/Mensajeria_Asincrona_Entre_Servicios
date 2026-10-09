@@ -13,12 +13,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+import pe.edu.upeu.orden.event.OrdenCreadaEvento;
+import pe.edu.upeu.orden.exception.ResourceNotFoundException;
+import pe.edu.upeu.orden.messaging.OrdenEventosProducer;
+import java.time.Instant;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrdenServiceImpl implements OrdenService {
 
     private final OrdenRepository ordenRepository;
     private final ProductoConsultaService productoConsultaService;
+    private final OrdenEventosProducer ordenEventosProducer;
 
     @Override
     @Transactional
@@ -65,14 +73,44 @@ public class OrdenServiceImpl implements OrdenService {
         orden.setEstado(validacionCompleta ? EstadoOrden.PENDIENTE_PAGO : EstadoOrden.CARRITO);
 
         Orden guardada = ordenRepository.save(orden);
+
+        if (guardada.getEstado() == EstadoOrden.PENDIENTE_PAGO) {
+            OrdenCreadaEvento evento = OrdenCreadaEvento.builder()
+                    .tipoEvento("orden.creada")
+                    .ordenId(guardada.getId())
+                    .idCliente(guardada.getIdCliente())
+                    .total(guardada.getTotal())
+                    .metodoPago(guardada.getMetodoPago())
+                    .origen("pagatu-orden-ms")
+                    .timestamp(Instant.now())
+                    .build();
+            ordenEventosProducer.publicarTrasCommit(evento);
+        }
+
         return toResponse(guardada);
+    }
+
+    @Override
+    @Transactional
+    public void marcarPagada(Long ordenId) {
+        Orden orden = ordenRepository.findById(ordenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada: " + ordenId));
+
+        if (orden.getEstado() == EstadoOrden.PAGADA) {
+            log.info("La orden {} ya se encuentra PAGADA (idempotencia).", ordenId);
+            return;
+        }
+
+        orden.setEstado(EstadoOrden.PAGADA);
+        ordenRepository.save(orden);
+        log.info("Orden {} actualizada a PAGADA tras confirmación de pago.", ordenId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public OrdenResponse findById(Long id) {
         Orden orden = ordenRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Orden no encontrada: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada: " + id));
         return toResponse(orden);
     }
 

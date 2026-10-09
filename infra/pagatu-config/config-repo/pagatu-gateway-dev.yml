@@ -27,6 +27,10 @@ spring:
               uri: lb://pagatu-cliente-ms
               predicates:
                 - Path=/api/v1/clientes/**
+            - id: pagatu-pago-ms
+              uri: lb://pagatu-pago-ms
+              predicates:
+                - Path=/api/v1/pagos/**
   security:
     oauth2:
       resourceserver:

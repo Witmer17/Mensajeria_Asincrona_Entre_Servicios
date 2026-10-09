@@ -103,12 +103,18 @@ flowchart TD
 | **pagatu-config** | Infraestructura | `18888` | `28888` | `http://localhost:18888/actuator/health` |
 | **pagatu-eureka** | Infraestructura | `18761` | `28761` | Dashboard: `http://localhost:18761/` |
 | **pagatu-gateway** | Infraestructura / Resource Server | `18080` | `28080` | Gateway API: `http://localhost:18080/` |
-| **pagatu-auth-ms** | Microservicio (Auth/JWT) | `8085` | Red interna Docker | JWKS: `/.well-known/jwks.json`, API: `/api/v1/auth/**` |
+| **Apache Kafka (KRaft)** | Mensajería Asíncrona | `19092` | `29092` | Broker Kafka (Topics: `orden-eventos`, `pago-eventos`) |
+| **Kafka UI (Kafbat)** | Gestión de Topics / Mensajes | `18085` | `28085` | Dashboard: `http://localhost:18085/` |
+| **pagatu-auth-ms** | Microservicio (Auth/JWT RS256) | `8085` | Red interna Docker | JWKS: `/.well-known/jwks.json`, API: `/api/v1/auth/**` |
 | **pagatu-catalogo-ms** | Microservicio | `8080` / `8081` | Red interna Docker | Swagger: `http://localhost:8080/swagger-ui.html` |
+| **pagatu-cliente-ms** | Microservicio / Resource Server | `8084` | Red interna Docker | Swagger: `http://localhost:8084/swagger-ui.html` |
 | **pagatu-orden-ms** | Microservicio / Resource Server | `8082` | Red interna Docker | Swagger: `http://localhost:8082/swagger-ui.html` |
+| **pagatu-pago-ms** | Microservicio / Event Consumer & Producer | `8086` | Red interna Docker | Swagger: `http://localhost:8086/swagger-ui.html` |
 | **PostgreSQL Auth** | Base de Datos | `15431` | `25431` | `pagatu_auth_db` (user/pwd: `pagatu`/`pagatu`) |
 | **PostgreSQL Catálogo** | Base de Datos | `15432` | `25432` | `pagatu_catalogo_db` (user/pwd: `pagatu`/`pagatu`) |
+| **PostgreSQL Clientes** | Base de Datos | `15433` | `25433` | `pagatu_cliente_db` (user/pwd: `pagatu`/`pagatu`) |
 | **PostgreSQL Órdenes** | Base de Datos | `15434` | `25434` | `pagatu_orden_db` (user/pwd: `pagatu`/`pagatu`) |
+| **PostgreSQL Pagos** | Base de Datos | `15435` | `25435` | `pagatu_pago_db` (user/pwd: `pagatu`/`pagatu`) |
 | **Prometheus** | Observabilidad | `19090` | `29090` | UI: `http://localhost:19090` |
 | **Loki** | Observabilidad | `13100` | `23100` | Ingesta de logs |
 | **Grafana** | Observabilidad | `13000` | `23000` | UI: `http://localhost:13000` (admin/admin) |

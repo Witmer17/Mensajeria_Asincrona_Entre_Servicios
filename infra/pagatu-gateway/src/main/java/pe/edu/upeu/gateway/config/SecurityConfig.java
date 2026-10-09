@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/clientes").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/clientes/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/clientes/**").hasAnyRole("CLIENTE", "ADMIN")
+                        .requestMatchers("/api/v1/pagos/**").hasAnyRole("CLIENTE", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

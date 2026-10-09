@@ -27,6 +27,29 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8085/.well-known/jwks.json
+  kafka:
+    bootstrap-servers: localhost:19092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: pagatu-orden-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.default.type: pe.edu.upeu.orden.event.PagoValidadoEvento
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+
+app:
+  kafka:
+    topic:
+      ordenes: orden-eventos
+      pagos: pago-eventos
 
 springdoc:
   swagger-ui:
